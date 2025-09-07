@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 import cherrypy
 import six
 from sqlalchemy import select
+from sqlalchemy.sql import func
 
 from libgutenberg import GutenbergGlobals as gg
 from libgutenberg import DublinCore, DublinCoreMapping, Models
@@ -67,7 +68,7 @@ class CoverPages(object):
             
 
             s += f"""
-                <a href="{href}" title="{title}" authors="{authors}" target="_top">
+                <a href="{href}" title="{title}" data-authors="{authors}" target="_top">
                     <div class="cover_image">
                         <div class="cover_img">
                             <img src="{url}" alt="{title}, {authors}" title="{title}"
@@ -98,6 +99,8 @@ class CoverPages(object):
 
             if order == 'popular':
                 order_by = Models.Book.downloads.desc()
+            elif order == 'random':
+                order_by = func.random()
             else:
                 order_by = Models.Book.release_date.desc()
             rows = session.execute(select(Models.Book.pk).where(
